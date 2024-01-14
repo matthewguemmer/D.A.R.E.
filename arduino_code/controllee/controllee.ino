@@ -4,6 +4,10 @@
 #define M2_1_PIN 6
 #define M2_2_PIN 9
 
+#include <Servo.h>
+Servo servo1;
+Servo servo2;
+
 struct packet {
    float leftSpd;
    float rightSpd;
@@ -53,6 +57,9 @@ void setup() {
   pinMode(M2_1_PIN, OUTPUT);
   pinMode(M2_2_PIN, OUTPUT);
 
+  servo1.attach(11);
+  servo2.attach(10);
+
   setMotor1PWM(0);
   setMotor2PWM(0);
 
@@ -76,13 +83,25 @@ void loop() {
   
   }
 
-  setMotor1PWM(packet.leftSpd);
-  setMotor2PWM(packet.rightSpd);
+  setMotor1PWM(-packet.rightSpd);
+  setMotor2PWM(packet.leftSpd);
 
   if ((!!packet.sw_1_state) ^ (!!packet.sw_2_state) ^ (!!packet.sw_3_state)) {
     digitalWrite(LED_BUILTIN, LOW);
   } else {
     digitalWrite(LED_BUILTIN, HIGH);
+  }
+
+  if (!!packet.sw_1_state) {
+    servo1.write(90);
+  } else {
+    servo1.write(170);
+  }
+
+  if (!!packet.sw_2_state) {
+    servo2.write(10);
+  } else {
+    servo2.write(100);
   }
 
   // consume the reset of the Serial buffer
